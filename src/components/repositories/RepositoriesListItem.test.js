@@ -2,12 +2,12 @@ import { screen, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RepositoriesListItem from './RepositoriesListItem';
 
-jest.mock('../tree/FileIcon', () => {
-  // Content of FileIcon.js
-  return () => {
-    return 'File Icon Component'
-  }
-})
+// jest.mock('../tree/FileIcon', () => {
+//   // Skip Content of FileIcon.js
+//   return () => {
+//     return 'File Icon Component'
+//   }
+// })
 
 function renderComponent() {
   const repository = {
@@ -23,18 +23,27 @@ function renderComponent() {
     <MemoryRouter>
       <RepositoriesListItem repository={repository} />
     </MemoryRouter>
-  )
+  );
+
+  return { repository };
 }
 
 test('shows a link to the github homepage for this repository', async () => {
-  renderComponent();
+  const { repository } = renderComponent();
 
-  // screen.debug();
-  // await pause();
-  // screen.debug();
-
+  // await pause()
+  // FindByRole is asyncrounous, it does the pause await above.
   await screen.findByRole('img', { name: 'Javascript' })
 
+  // Don't use professionaly this avoid act method
+  // await act(async () => {
+  //   await pause();
+  // })
+
+  const link = screen.getByRole('link', {
+    name: /github repository/i,
+  });
+  expect(link).toHaveAttribute('href', repository.html_url);
 });
 
 // const pause = () => {
