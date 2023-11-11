@@ -1,13 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { SWRConfig } from 'swr';
 import { createServer } from '../../test/server';
 import AuthButtons from './AuthButtons';
 
 async function renderComponent() {
   render(
-    <MemoryRouter>
-      <AuthButtons />
-    </MemoryRouter>
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <MemoryRouter>
+        <AuthButtons />
+      </MemoryRouter>
+    </SWRConfig>
   )
   await screen.findAllByRole('link')
 }
@@ -21,6 +24,7 @@ describe('when user is not signed in', () => {
   ]);
 
   test('sign in and sign up are visible', async () => {
+    debugger;
     await renderComponent();
 
     const signInButton = screen.getByRole('link', {
@@ -56,6 +60,8 @@ describe('when user is not signed in', () => {
 //   setTimeout(resolve, 100);
 // })
 
+// describe.only('when user is signed in', () => {
+
 describe('when user is signed in', () => {
   // createServer() ---> GET '/api/user' ---> { user: { id: 3, email: 'johndoe@email.com' } }
   createServer([
@@ -66,7 +72,9 @@ describe('when user is signed in', () => {
     }
   ])
 
+  // test.only('sign in and sign up are not visible', async () => {
   test('sign in and sign up are not visible', async () => {
+    debugger;
     await renderComponent();
 
     const signInButton = screen.queryByRole('link', {
@@ -89,6 +97,6 @@ describe('when user is signed in', () => {
     })
 
     expect(signOutButton).toBeInTheDocument();
-    expect(signOutButton).toHaveAttribute('href', 'signout');
+    expect(signOutButton).toHaveAttribute('href', '/signout');
   })
 });
